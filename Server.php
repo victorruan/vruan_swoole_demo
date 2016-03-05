@@ -11,7 +11,8 @@ class Server
             'daemonize' => false,
             'max_request' => 100,
             'dispatch_mode' => 2,
-            'debug_mode'=> 1
+            'debug_mode'=> 1,
+            'task_worker_num' => 8 //开启Task功能
         ));
         $this->serv->on('Start', array($this, 'onStart'));
         $this->serv->on('Connect', array($this, 'onConnect'));
@@ -25,12 +26,20 @@ class Server
         echo "Start\n";
     }
 
-    public function onConnect( $serv, $fd, $from_id ) {
+    public function onConnect(swoole_server $serv, $fd, $from_id ) {
         $serv->send( $fd, "Hello {$fd}!" );
     }
 
     public function onReceive( swoole_server $serv, $fd, $from_id, $data ) {
         echo "Get Message From Client {$fd}:{$data}\n";
+        // send a task to task worker.
+        $param = array(
+            'fd' => $fd
+        );
+        // start a task
+        $serv->task( json_encode( $param ) );
+
+        echo "Continue Handle Worker\n";
     }
 
     public function onClose( $serv, $fd, $from_id ) {

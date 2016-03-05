@@ -1,2 +1,2 @@
 # vruan_swoole_demo
-个人学习swoole demo 和 笔记
+个人学习swoole的demo和笔记
